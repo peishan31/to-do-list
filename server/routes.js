@@ -43,7 +43,7 @@ router.delete("/todos/:id", async (req, res) => {
     res.status(200).json(deletedTodo);
 });
 
-// PUT /todos/:id
+// PUT /todos/:id --> change status
 router.put("/todos/:id", async (req, res) => {
     const collection = getCollection();
     const _id = new ObjectId(req.params.id);
@@ -54,6 +54,21 @@ router.put("/todos/:id", async (req, res) => {
     }
 
     const updatedTodo = await collection.updateOne({ _id }, { $set: { status: !status } });
+
+    res.status(200).json(updatedTodo);
+});
+
+// PUT /todosname/:id --> change todo
+router.put("/todosname/:id", async (req, res) => {
+    const collection = getCollection();
+    const _id = new ObjectId(req.params.id);
+    const { todo } = req.body;
+
+    if (typeof todo !== "string") {
+        return res.status(400).json({ msg: "invalid todo"});
+    }
+
+    const updatedTodo = await collection.updateOne({ _id }, { $set: { todo: todo } });
 
     res.status(200).json(updatedTodo);
 });

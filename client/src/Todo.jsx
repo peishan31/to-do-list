@@ -39,8 +39,22 @@ export default function Todo(props) {
         }
     };
 
-    const handleInputChange = (e) => {
-        setInputValue(e.target.value);
+    const handleInputChange = (todoId) => async (e) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+    
+        const res = await fetch(`/api/todosname/${todoId}`, {
+            method: "PUT",
+            body: JSON.stringify({ todo: newValue }),
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
+    
+        const json = await res.json();
+        if (!json.acknowledged) {
+            console.error("Failed to update todo");
+        }
     };
 
     return (
@@ -51,7 +65,7 @@ export default function Todo(props) {
                     // value={todo.todo}
                     value={inputValue}
                     className="form__input"
-                    onChange={handleInputChange}
+                    onChange={handleInputChange(todo._id)}
                     />
             </p>
             <div className="mutations">
