@@ -1,7 +1,8 @@
-
+import React, { useState } from 'react';
 
 export default function Todo(props) {
     const { todo, setTodos } = props;
+    const [inputValue, setInputValue] = useState(todo.todo);
 
     const updateTodo = async (todoId, todoStatus) => {
         const res = await fetch(`/api/todos/${todoId}`, {
@@ -38,9 +39,21 @@ export default function Todo(props) {
         }
     };
 
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+    };
+
     return (
         <div className="todo">
-            <p>{todo.todo}</p>
+            <p>
+                <input 
+                    type="text"
+                    // value={todo.todo}
+                    value={inputValue}
+                    className="form__input"
+                    onChange={handleInputChange}
+                    />
+            </p>
             <div className="mutations">
                 <button
                     className="todo__status"
