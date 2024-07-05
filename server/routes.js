@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { getConnectedClient } = require("./database");
 const { ObjectId } = require("mongodb");
+const { getAuth, GoogleAuthProvider, signInWithPopup } = require('firebase/auth');
 
 const getCollection = () => {
     const client = getConnectedClient();
@@ -118,6 +119,50 @@ router.put("/todosname/:id", async (req, res) => {
         res.status(200).json({ acknowledged: true, updatedAt: updatedAt });
     } catch (error) {
         res.status(500).json({ msg: error.message || "Internal Server Error" });
+    }
+});
+
+// google auth
+router.post('/auth/google', async (req, res) => {
+    const { name, email, googlePhotoUrl } = req.body;
+
+    const client = await getConnectedClient();
+    const usersCollection = client.db("todosdb").collection("users");
+
+    try {
+        console.log("name: ",name);
+        console.log("email: ",email);
+        console.log("googlePhotoUrl: ",googlePhotoUrl);
+        
+        const existingUser = await usersCollection.findOne({ email });
+
+        if (existingUser) { // User already exists, return user data
+            res.status(200).json(existingUser);
+        } else { // User doesn't exist, create a new user
+            
+            const newUser = {
+                name,
+                email,
+                googlePhotoUrl,
+                createdAt: new Date(),
+            };
+
+            const result = await usersCollection.insertOne(newUser);
+            console.log("Inserted user:", result);
+
+            if (result.acknowledged && result.insertedId) {
+                const insertedUser = {
+                    _id: result.insertedId,
+                    ...newUser,
+                };
+                res.status(201).json(insertedUser);
+            } else {
+                throw new Error('Failed to insert user');
+            }
+        }
+    } catch (error) {
+        console.error('Error in authentication process:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 

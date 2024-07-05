@@ -1,20 +1,21 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React from 'react';
+import { Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import TodoList from "./pages/todo/TodoList";
+import ProtectedRoutes from './utils/ProtectedRoutes';
 
 export default function App() {
   return (
     <div>
-      {/* <Login/>
-      <TodoList/> */}
-      <Router>
-          <Routes>
-            <Route index element={<Login />} />
-            <Route path="/login" element={<Login />} />
+        <Routes>
+          <Route index element={<Login />} />
+          {/* <Route path="/login" element={<Login />} /> */}
+          {/* <Route path="/TodoList" element={<TodoList />} /> */}
+          <Route element={<ProtectedRoutes/>}>
             <Route path="/TodoList" element={<TodoList />} />
-            {/* <Route path="*" element={<NoPage />} /> */}
-        </Routes>
-      </Router>
+          </Route>
+          {/* <Route path="*" element={<NoPage />} /> */}
+      </Routes>
     </div>
     
   );

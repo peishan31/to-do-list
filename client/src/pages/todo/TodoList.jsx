@@ -1,3 +1,4 @@
+import Header from "../../components/Header";
 import Todo from "./Todo"
 import { useEffect, useState } from "react";
 
@@ -54,7 +55,8 @@ const TodoList = () => {
 
 
     return (
-        <main className="container">
+        <main>
+            <Header />
             <h1 className="title">To Do List ✏️</h1>
             <form className="form" onSubmit={createNewTodo}>
                 <input 

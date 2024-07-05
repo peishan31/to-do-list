@@ -4,7 +4,6 @@ import OAuth from '../../components/OAuth'
 const Login = () => {
   return (
     <div>
-      Login Page
       <OAuth />
     </div>
   )
