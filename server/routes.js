@@ -80,13 +80,15 @@ router.put("/todos/:id", async (req, res) => {
             return res.status(400).json({ msg: "invalid status"});
         }
 
-        const updatedTodo = await collection.updateOne({ _id }, { $set: { status: !status } });
+        const updatedAt = new Date();
+        const updatedTodo = await collection.updateOne({ _id }, { $set: { status: !status, updatedAt: updatedAt } });
 
         if (updatedTodo.matchedCount === 0) {
             return res.status(404).json({ msg: "Todo not found" });
         }
 
-        res.status(200).json(updatedTodo);
+        // res.status(200).json(updatedTodo);
+        res.status(200).json({ acknowledged: true, updatedAt: updatedAt });
     } catch (error) {
         res.status(500).json({ msg: error.message || "Internal Server Error" });
     }
