@@ -11,66 +11,112 @@ const getCollection = () => {
 
 // GET /todos
 router.get("/todos", async (req, res) => {
-    const collection = getCollection();
-    const todos = await collection.find({}).toArray();
+    try {
 
-    res.status(200).json(todos);
+        if (req.query.triggerError) {
+            throw new Error("Intentional error triggered");
+        }
+
+        const collection = getCollection();
+        const todos = await collection.find({}).toArray();
+
+        res.status(200).json(todos);
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message || "Internal Server Error" });
+    }
 });
 
 // POST /todos
 router.post("/todos", async (req, res) => {
-    const collection = getCollection();
-    let { todo } = req.body;
+    try {
+        const collection = getCollection();
+        let { todo } = req.body;
 
-    if (!todo) {
-        return res.status(400).json({ msg: "error no todo found"});
+        if (!todo) {
+            return res.status(400).json({ msg: "Error: No todo found"});
+        }
+
+        todo = (typeof todo === "string") ? todo : JSON.stringify(todo);
+        if (todo.length <= 1) {
+            return res.status(400).json({ msg: "Error: Todo content must have length greater than 1" });
+        }
+
+        const newTodo = await collection.insertOne({ todo, status: false, createdAt: new Date() });
+
+        res.status(201).json({ todo, status: false, _id: newTodo.insertedId, createdAt: new Date() });
     }
-
-    todo = (typeof todo === "string") ? todo : JSON.stringify(todo);
-
-    const newTodo = await collection.insertOne({ todo, status: false });
-
-    res.status(201).json({ todo, status: false, _id: newTodo.insertedId });
+    catch (error) {
+        res.status(500).json({ msg: error.message || "Internal Server Error" });
+    }
 });
 
 // DELETE /todos/:id
 router.delete("/todos/:id", async (req, res) => {
-    const collection = getCollection();
-    const _id = new ObjectId(req.params.id);
+    try {
+        const collection = getCollection();
+        const _id = new ObjectId(req.params.id);
 
-    const deletedTodo = await collection.deleteOne({ _id });
+        const deletedTodo = await collection.deleteOne({ _id });
 
-    res.status(200).json(deletedTodo);
+        if (deletedTodo.deletedCount === 0) {
+            return res.status(404).json({ msg: "Todo not found" });
+        }
+
+        res.status(200).json(deletedTodo);
+    } catch (error) {
+        res.status(500).json({ msg: error.message || "Internal Server Error" });
+    }
 });
 
 // PUT /todos/:id --> change status
 router.put("/todos/:id", async (req, res) => {
-    const collection = getCollection();
-    const _id = new ObjectId(req.params.id);
-    const { status } = req.body;
+    try {
+        const collection = getCollection();
+        const _id = new ObjectId(req.params.id);
+        const { status } = req.body;
 
-    if (typeof status !== "boolean") {
-        return res.status(400).json({ msg: "invalid status"});
+        if (typeof status !== "boolean") {
+            return res.status(400).json({ msg: "invalid status"});
+        }
+
+        const updatedTodo = await collection.updateOne({ _id }, { $set: { status: !status } });
+
+        if (updatedTodo.matchedCount === 0) {
+            return res.status(404).json({ msg: "Todo not found" });
+        }
+
+        res.status(200).json(updatedTodo);
+    } catch (error) {
+        res.status(500).json({ msg: error.message || "Internal Server Error" });
     }
-
-    const updatedTodo = await collection.updateOne({ _id }, { $set: { status: !status } });
-
-    res.status(200).json(updatedTodo);
 });
 
 // PUT /todosname/:id --> change todo
 router.put("/todosname/:id", async (req, res) => {
-    const collection = getCollection();
-    const _id = new ObjectId(req.params.id);
-    const { todo } = req.body;
+    try {
+        const collection = getCollection();
+        const _id = new ObjectId(req.params.id);
+        const { todo } = req.body;
 
-    if (typeof todo !== "string") {
-        return res.status(400).json({ msg: "invalid todo"});
+        if (typeof todo !== "string" || todo.trim() === "") {
+            return res.status(400).json({ msg: "Invalid todo" });
+        }
+
+        const updatedAt = new Date();
+        const updatedTodo = await collection.updateOne(
+            { _id },
+            { $set: { todo: todo, updatedAt: updatedAt } }
+        );
+
+        if (updatedTodo.matchedCount === 0) {
+            return res.status(404).json({ msg: "Todo not found" });
+        }
+
+        res.status(200).json({ acknowledged: true, updatedAt: updatedAt });
+    } catch (error) {
+        res.status(500).json({ msg: error.message || "Internal Server Error" });
     }
-
-    const updatedTodo = await collection.updateOne({ _id }, { $set: { todo: todo } });
-
-    res.status(200).json(updatedTodo);
 });
 
 module.exports = router;
