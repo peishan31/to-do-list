@@ -62,7 +62,7 @@ const TodoList = () => {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Enter your Todo..."
-                className="form__input"
+                className="form__input text-black"
                 required 
                 />
                 <button className="form__button" type="submit">➕</button>

@@ -1,8 +1,12 @@
 import React from 'react'
+import OAuth from '../../components/OAuth'
 
 const Login = () => {
   return (
-    <div>Login</div>
+    <div>
+      Login Page
+      <OAuth />
+    </div>
   )
 }
 

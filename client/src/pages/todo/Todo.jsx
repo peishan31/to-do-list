@@ -103,7 +103,7 @@ const Todo = ({ todo, setTodos }) => {
                     <input 
                         type="text"
                         value={inputValue}
-                        className="form__input"
+                        className="form__input text-black"
                         onChange={handleInputChange}
                     />
                 </p>
