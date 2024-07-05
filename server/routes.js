@@ -130,10 +130,6 @@ router.post('/auth/google', async (req, res) => {
     const usersCollection = client.db("todosdb").collection("users");
 
     try {
-        console.log("name: ",name);
-        console.log("email: ",email);
-        console.log("googlePhotoUrl: ",googlePhotoUrl);
-        
         const existingUser = await usersCollection.findOne({ email });
 
         if (existingUser) { // User already exists, return user data

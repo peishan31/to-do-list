@@ -28,7 +28,7 @@ const Header = () => {
                     </span>
                 </Navbar.Brand>
                 <div className="flex">
-                    <Link to="/login" onClick={handleLogout} className="nav-link text-gray-700 hover:text-blue-600">
+                    <Link to="/" onClick={handleLogout} className="nav-link text-gray-700 hover:text-blue-600">
                         Logout
                     </Link>
                 </div>

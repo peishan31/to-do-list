@@ -11,11 +11,18 @@ const userSlice = createSlice({
     reducers: {
         signInSuccess: (state, action) => {
             state.isLoggedIn = true;
-            state.currentUser = action.payload;
+            state.user = action.payload;
+
+            localStorage.setItem('user', JSON.stringify(action.payload));
+            localStorage.setItem('isLoggedIn', 'true')
         },
         signOutSuccess: (state) => {
+            console.log("logged out triggered")
             state.isLoggedIn = false;
-            state.currentUser = null;
+            state.user = null;
+
+            localStorage.removeItem('user');
+            localStorage.removeItem('isLoggedIn');
         },
     },
 });
